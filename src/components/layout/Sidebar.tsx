@@ -16,6 +16,7 @@ import {
 import { useCart } from '../../context/CartContext';
 import { useSettings } from '../../context/SettingsContext';
 import { stockService } from '../../services/stockService';
+import { PWAInstallButton } from '../ui/PWAInstallButton';
 
 export type AppPage =
   | 'dashboard'
@@ -113,6 +114,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate }) => 
           );
         })}
       </nav>
+
+      {/* 1-Click Install Button */}
+      <div className="px-3 pb-3">
+        <PWAInstallButton variant="sidebar" onOpenGuide={() => onNavigate('deployment')} />
+      </div>
 
       {/* Footer Info */}
       <div className="p-3 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">

@@ -4,6 +4,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { useCart } from '../../context/CartContext';
 import { ShoppingCart, Clock, ShieldCheck } from 'lucide-react';
 import { formatCurrency } from '../../config/ui.config';
+import { PWAInstallButton } from '../ui/PWAInstallButton';
 
 interface TopBarProps {
   currentPage: AppPage;
@@ -67,6 +68,9 @@ export const TopBar: React.FC<TopBarProps> = ({ currentPage, onNavigate }) => {
           <Clock className="w-3.5 h-3.5 text-slate-600" />
           <span>{timeStr}</span>
         </div>
+
+        {/* 1-Click Install Button on PC */}
+        <PWAInstallButton onOpenGuide={() => onNavigate('deployment')} />
 
         {/* Quick Cart Pill if not on POS */}
         {currentPage !== 'pos' && itemCount > 0 && (

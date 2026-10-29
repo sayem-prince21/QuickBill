@@ -94,6 +94,10 @@ export const reportsService = {
       paymentMethod: s.paymentMethod,
       status: s.status,
       itemCount: s.itemCount,
+      products: s.items.map((it) => ({
+        productName: it.productName,
+        quantity: it.quantity,
+      })),
     }));
 
     return {

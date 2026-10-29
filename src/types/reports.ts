@@ -23,6 +23,7 @@ export interface DashboardMetrics {
     paymentMethod: PaymentMethod;
     status: SaleStatus;
     itemCount: number;
+    products: { productName: string; quantity: number }[];
   }[];
 }
 

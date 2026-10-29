@@ -285,8 +285,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
               <tr>
                 <th className="py-2.5 px-3">Invoice Number</th>
                 <th className="py-2.5 px-3">Date & Time</th>
-                <th className="py-2.5 px-3">Items</th>
+                <th className="py-2.5 px-3">Products Sold</th>
                 <th className="py-2.5 px-3">Payment</th>
+                <th className="py-2.5 px-3 text-center">Qty</th>
                 <th className="py-2.5 px-3">Total Amount</th>
                 <th className="py-2.5 px-3">Status</th>
                 <th className="py-2.5 px-3 text-right">Actions</th>
@@ -295,14 +296,25 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             <tbody className="divide-y divide-slate-100">
               {metrics.recentSales.map((sale) => (
                 <tr key={sale.id} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="py-2.5 px-3 font-mono font-bold text-slate-900">
+                  <td className="py-2.5 px-3 font-mono font-bold text-slate-900 whitespace-nowrap">
                     {sale.invoiceNumber}
                   </td>
-                  <td className="py-2.5 px-3 text-slate-600">
+                  <td className="py-2.5 px-3 text-slate-600 whitespace-nowrap">
                     {formatDateTime(sale.saleDateTime)}
                   </td>
-                  <td className="py-2.5 px-3 text-slate-700">
-                    {sale.itemCount} {sale.itemCount === 1 ? 'item' : 'items'}
+                  <td className="py-2.5 px-3 max-w-[200px]">
+                    <div className="space-y-0.5">
+                      {sale.products?.map((p, idx) => (
+                        <div key={idx} className="flex items-center gap-1.5 text-xs">
+                          <span className="font-semibold text-slate-800 line-clamp-1" title={p.productName}>
+                            {p.productName}
+                          </span>
+                          <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-1 rounded shrink-0">
+                            ×{p.quantity}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </td>
                   <td className="py-2.5 px-3 font-medium text-slate-800">
                     {sale.paymentMethod}

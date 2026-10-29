@@ -21,7 +21,16 @@ export const salesService = {
 
     if (filter.invoiceNumber && filter.invoiceNumber.trim()) {
       const q = filter.invoiceNumber.trim().toLowerCase();
-      sales = sales.filter((s) => s.invoiceNumber.toLowerCase().includes(q));
+      sales = sales.filter(
+        (s) =>
+          s.invoiceNumber.toLowerCase().includes(q) ||
+          s.items.some(
+            (item) =>
+              item.productName.toLowerCase().includes(q) ||
+              item.sku.toLowerCase().includes(q)
+          ) ||
+          (s.customerName && s.customerName.toLowerCase().includes(q))
+      );
     }
 
     if (filter.paymentMethod && filter.paymentMethod !== 'All') {

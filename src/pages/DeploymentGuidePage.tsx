@@ -95,11 +95,95 @@ Filename: "{app}\\QuickBilling.Api.exe"; Description: "{cm:LaunchProgram,QuickBi
       {/* Header */}
       <div className="pb-2 border-b border-slate-200">
         <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">
-          Windows Desktop Packaging & Inno Setup
+          How to Install & Run QuickBilling on Your PC
         </h1>
         <p className="text-xs text-slate-600">
-          Complete self-contained offline deployment specifications for Windows 10/11 64-bit systems
+          Choose the best installation method for your PC: 1-Click Desktop App, Setup .exe Installer, or Local Dev
         </p>
+      </div>
+
+      {/* Primary 3 Installation Methods Comparison */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+        <div className="flex items-center gap-2">
+          <HardDriveDownload className="w-5 h-5 text-emerald-600" />
+          <h2 className="text-base font-bold text-slate-900">3 Ways to Install on Your Computer</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+          {/* Method 1: Instant 1-Click Install */}
+          <div className="p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50/30 flex flex-col justify-between space-y-3">
+            <div>
+              <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white mb-2">
+                RECOMMENDED & FASTEST
+              </span>
+              <h3 className="text-sm font-bold text-slate-900">1. Instant 1-Click Desktop App</h3>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                Install directly on your Windows PC from Google Chrome or Microsoft Edge with zero compilers or terminal tools.
+              </p>
+              <div className="mt-3 p-2.5 bg-white rounded-lg border border-emerald-200 text-[11px] text-slate-700 space-y-1">
+                <p><strong>How to install:</strong></p>
+                <ol className="list-decimal list-inside space-y-0.5 text-slate-600">
+                  <li>Click <strong>"Install Desktop App"</strong> in the top bar.</li>
+                  <li>Or click the <strong>⊕ Install</strong> icon in your browser URL bar.</li>
+                  <li>Windows installs a native Desktop icon & Start Menu app!</li>
+                </ol>
+              </div>
+            </div>
+            <div className="text-[11px] font-semibold text-emerald-800">
+              ✓ Works 100% offline with local database
+            </div>
+          </div>
+
+          {/* Method 2: Inno Setup Windows .exe */}
+          <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-3">
+            <div>
+              <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white mb-2">
+                RETAIL DISTRIBUTION
+              </span>
+              <h3 className="text-sm font-bold text-slate-900">2. Standalone Windows Setup (.exe)</h3>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                Generate a single-file <code>QuickBilling-Setup.exe</code> to distribute to other cash registers or customer PCs.
+              </p>
+              <div className="mt-3 p-2.5 bg-white rounded-lg border border-slate-200 text-[11px] text-slate-700 space-y-1">
+                <p><strong>Build command:</strong></p>
+                <pre className="p-1.5 bg-slate-900 text-emerald-400 rounded text-[10px] font-mono">
+                  .\scripts\publish-windows.ps1
+                </pre>
+                <p className="text-slate-600 text-[10px]">
+                  Requires .NET 8 SDK & Inno Setup 6 on build machine only.
+                </p>
+              </div>
+            </div>
+            <div className="text-[11px] font-semibold text-indigo-800">
+              ✓ Bundled self-contained runtime
+            </div>
+          </div>
+
+          {/* Method 3: Developer Terminal */}
+          <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-3">
+            <div>
+              <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-white mb-2">
+                DEVELOPER MODE
+              </span>
+              <h3 className="text-sm font-bold text-slate-900">3. Run Locally with Node.js</h3>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                Run directly in any web browser on your PC for development, testing, or quick local retail use.
+              </p>
+              <div className="mt-3 p-2.5 bg-white rounded-lg border border-slate-200 text-[11px] text-slate-700 space-y-1">
+                <p><strong>Commands:</strong></p>
+                <pre className="p-1.5 bg-slate-900 text-slate-200 rounded text-[10px] font-mono">
+                  npm install{'\n'}npm run dev
+                </pre>
+                <p className="text-slate-600 text-[10px]">
+                  Opens at <code>http://localhost:3000</code>
+                </p>
+              </div>
+            </div>
+            <div className="text-[11px] font-semibold text-slate-700">
+              ✓ Instant live hot reload
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Overview Cards */}

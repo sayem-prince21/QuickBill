@@ -112,7 +112,7 @@ export const SalesRegisterPage: React.FC = () => {
             <Search className="w-4 h-4 text-slate-600 absolute left-3 top-3 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search by invoice number (e.g. INV-2026...)..."
+              placeholder="Search by invoice number, product name, or customer..."
               value={searchInvoice}
               onChange={(e) => setSearchInvoice(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
@@ -193,9 +193,10 @@ export const SalesRegisterPage: React.FC = () => {
               <tr>
                 <th className="py-3 px-4">Invoice #</th>
                 <th className="py-3 px-4">Date & Time</th>
+                <th className="py-3 px-4">Products Sold</th>
                 <th className="py-3 px-4">Customer</th>
                 <th className="py-3 px-4">Payment</th>
-                <th className="py-3 px-4 text-center">Items</th>
+                <th className="py-3 px-4 text-center">Qty</th>
                 <th className="py-3 px-4 text-right">Subtotal</th>
                 <th className="py-3 px-4 text-right">Discount</th>
                 <th className="py-3 px-4 text-right">Total Amount</th>
@@ -206,7 +207,7 @@ export const SalesRegisterPage: React.FC = () => {
             <tbody className="divide-y divide-slate-100">
               {sales.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="py-12 text-center text-slate-600">
+                  <td colSpan={11} className="py-12 text-center text-slate-600">
                     No sales invoices found matching the current filters.
                   </td>
                 </tr>
@@ -218,7 +219,7 @@ export const SalesRegisterPage: React.FC = () => {
                       sale.status === 'Cancelled' ? 'bg-rose-50/30' : ''
                     }`}
                   >
-                    <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                    <td className="py-3 px-4 font-mono font-bold text-slate-900 whitespace-nowrap">
                       {sale.invoiceNumber}
                     </td>
 
@@ -226,7 +227,25 @@ export const SalesRegisterPage: React.FC = () => {
                       {formatDateTime(sale.saleDateTime)}
                     </td>
 
-                    <td className="py-3 px-4 text-slate-700">
+                    <td className="py-3 px-4 min-w-[220px] max-w-xs">
+                      <div className="space-y-1">
+                        {sale.items.map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-1.5 text-xs">
+                            <span
+                              className="font-semibold text-slate-800 line-clamp-1"
+                              title={`${item.productName} (${item.sku})`}
+                            >
+                              {item.productName}
+                            </span>
+                            <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-1.5 py-0.2 rounded shrink-0">
+                              ×{item.quantity}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </td>
+
+                    <td className="py-3 px-4 text-slate-700 whitespace-nowrap">
                       {sale.customerName || 'Walk-in'}
                     </td>
 
