@@ -1,0 +1,960 @@
+# MASTER PROMPT: Build a Complete Offline Quick Billing & Mini POS Desktop Application
+
+## 1. Your Role
+
+Act as a senior software architect, senior React developer, senior ASP.NET Core developer, database designer, UI/UX designer, QA engineer, and Windows desktop deployment specialist.
+
+Build a complete, production-oriented, offline-first Quick Billing and Mini POS application for a small retail shop.
+
+Do not create only a prototype, static dashboard, or UI mockup. Build a functional application with working frontend components, backend APIs, database persistence, stock management, billing, reporting, Excel export, and Windows deployment support.
+
+The code must be clean, modular, reusable, readable, maintainable, and beginner-friendly.
+
+Explain important implementation decisions and provide exact terminal commands and file paths.
+
+---
+
+## 2. Primary Goal
+
+Create a Windows 10/11 64-bit desktop-oriented billing application that:
+
+- Works without an internet connection after installation.
+- Can be distributed to another compatible Windows computer through a Windows Setup `.exe` installer.
+- Uses a separate local database on each computer.
+- Does not require a cloud server, external API, or internet connection for normal operation.
+- Stores all products, sales, stock, and payment information locally.
+- Supports Excel export and local database backup and restore.
+- Provides a modern, fast, professional retail POS interface.
+- Allows the owner to customize product cards and other UI components easily without modifying unrelated business logic.
+
+The application is designed primarily for one computer and one local database at a time. Cross-device synchronization is not required.
+
+## 3. Mandatory Technology Stack
+
+### Frontend
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- React Router when routing is needed
+- Lucide React icons
+- React Hook Form for complex forms when useful
+- A lightweight, consistent component system
+
+### Backend
+- ASP.NET Core Web API
+- C#
+- Entity Framework Core
+- SQLite database provider
+- DTOs for API input and output
+- Dependency injection
+- Service layer for business logic
+- Data validation and centralized error handling
+
+### Database
+- SQLite
+- Database file stored outside the installation directory, preferably at:
+
+  `%LOCALAPPDATA%\QuickBilling\quickbilling.db`
+
+- EF Core migrations
+- Decimal-compatible monetary values with explicit precision and appropriate SQLite storage strategy
+- Foreign keys and appropriate indexes
+- Transactional operations for completing and cancelling sales
+
+### Excel
+- ClosedXML or another suitable .NET Excel library
+- Generate real `.xlsx` files without requiring Microsoft Excel to be installed
+
+### Windows Distribution
+- Self-contained .NET publish for Windows x64
+- Production React build served locally by ASP.NET Core
+- Inno Setup or an equivalent Windows installer builder
+- Start Menu and optional Desktop shortcuts
+- Uninstaller
+- Preserve user data when upgrading or uninstalling by default
+- Document how to build the final Setup `.exe`
+
+### Desktop Window
+Prefer a reliable local desktop experience.
+
+First, make the complete application work offline with React served by the local ASP.NET Core backend.
+
+If a native desktop window is implemented, use a suitable wrapper such as Tauri and explain how it starts and stops the local backend safely. Do not assume that a web application becomes a native desktop application merely because it is packaged in an installer.
+
+If native packaging creates excessive complexity, prioritize a reliable offline Windows installer with a local browser UI, then document native-window packaging as a separate optional phase.
+
+Do not use remote fonts, CDN-hosted JavaScript, external images, cloud APIs, or remote resources required for normal application operation.
+
+---
+
+## 4. Architecture and Clean Code Rules
+
+Use a clear separation of responsibilities.
+
+Suggested solution structure:
+
+QuickBilling/
+├── QuickBilling.sln
+├── src/
+│   ├── QuickBilling.Api/
+│   │   ├── Controllers/
+│   │   ├── Middleware/
+│   │   ├── Program.cs
+│   │   ├── wwwroot/
+│   │   └── QuickBilling.Api.csproj
+│   ├── QuickBilling.Application/
+│   │   ├── DTOs/
+│   │   ├── Interfaces/
+│   │   ├── Services/
+│   │   └── Validators/
+│   ├── QuickBilling.Domain/
+│   │   ├── Entities/
+│   │   ├── Enums/
+│   │   └── Common/
+│   └── QuickBilling.Infrastructure/
+│       ├── Data/
+│       ├── Configurations/
+│       ├── Repositories/
+│       └── Migrations/
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   ├── components/
+│   │   │   ├── ui/
+│   │   │   ├── products/
+│   │   │   ├── billing/
+│   │   │   ├── reports/
+│   │   │   └── layout/
+│   │   ├── features/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── types/
+│   │   ├── utils/
+│   │   ├── config/
+│   │   └── styles/
+│   └── package.json
+├── installer/
+│   ├── installer.iss
+│   └── README.md
+├── scripts/
+│   └── publish-windows.ps1
+├── tests/
+└── README.md
+
+This is a suggested structure, not a reason to create unnecessary abstraction. Keep the project simple enough for a beginner to understand.
+
+### Clean code requirements
+
+1. Follow SOLID principles where appropriate.
+2. Use meaningful names for variables, classes, methods, and components.
+3. Keep controllers thin.
+4. Keep business logic out of React UI components.
+5. Use services for billing, stock, reporting, backup, and Excel export.
+6. Use DTOs instead of exposing database entities directly.
+7. Use TypeScript types for all major API models.
+8. Avoid `any` unless there is a documented reason.
+9. Avoid giant components and duplicate code.
+10. Avoid hardcoded product cards, prices, stock, sales, or dashboard statistics in production UI.
+11. Centralize API calls in service modules.
+12. Use reusable form controls, buttons, dialogs, tables, badges, and cards.
+13. Use environment configuration only where appropriate; do not require internet-hosted configuration.
+14. Add comments for non-obvious business rules, not every line.
+15. Handle loading, empty, success, and error states.
+16. Never silently swallow exceptions.
+17. Use database transactions when multiple records must be updated together.
+18. Include useful validation messages and structured error responses.
+19. Use cancellation-safe and concurrency-aware database operations where appropriate.
+20. Avoid overengineering and unnecessary packages.
+
+Provide a concise architecture explanation before implementing the code.
+
+---
+
+## 5. Critical Requirement: Easily Customizable Product Cards
+
+This is one of the highest-priority requirements.
+
+I must be able to change the appearance and layout of product cards without modifying the billing logic or rewriting multiple components.
+
+Create a reusable `ProductCard` component and separate product data from presentation.
+
+Example:
+
+`frontend/src/components/products/ProductCard.tsx`
+
+`frontend/src/components/products/ProductGrid.tsx`
+
+`frontend/src/components/products/product-card.config.ts`
+
+`frontend/src/types/product.ts`
+
+Create a centralized design configuration containing settings such as:
+
+- Card layout: compact, standard, detailed
+- Card width and minimum height
+- Image visibility
+- Image aspect ratio
+- Product name visibility
+- Product SKU visibility
+- Category badge visibility
+- Price visibility
+- Stock badge visibility
+- Low-stock warning visibility
+- Product image position
+- Border radius
+- Shadow style
+- Grid column count or responsive grid behavior
+- Font sizes
+- Spacing
+- Hover effect
+- Out-of-stock appearance
+- Add-to-cart button visibility
+- Product selection behavior
+
+Do not create separate hardcoded implementations for every layout.
+
+Use reusable props and configuration to change the appearance.
+
+For example, the configuration could support:
+
+- `layout: "compact" | "standard" | "detailed"`
+- `showImage: boolean`
+- `showSku: boolean`
+- `showStock: boolean`
+- `showCategory: boolean`
+- `showAddButton: boolean`
+
+These are examples. Implement a coherent type-safe configuration rather than blindly copying them.
+
+### Product card behavior
+
+Each product card should support:
+
+- Product image
+- Product name
+- SKU or product code
+- Category
+- Selling price
+- Available stock
+- Low-stock warning
+- Out-of-stock state
+- Quick add-to-cart action
+
+Clicking an available product card should add one unit to the current cart.
+
+Clicking it repeatedly should increase quantity.
+
+Clicking an out-of-stock product must not add it to the cart.
+
+Prevent duplicate implementations of click-to-add behavior.
+
+Keep the card presentation separate from cart operations.
+
+Use a single cart service, hook, or state-management mechanism to manage cart changes.
+
+### Customization requirements
+
+Provide a clearly documented file such as:
+
+`frontend/src/config/ui.config.ts`
+
+and a dedicated product card configuration file.
+
+Changing these configuration files should make it easy to adjust the UI without modifying backend code.
+
+Also provide a central theme configuration for:
+
+- Primary color
+- Secondary color
+- Background
+- Text colors
+- Border radius
+- Spacing
+- Typography
+
+Where practical, add an optional Settings page to change supported UI preferences and persist those preferences locally.
+
+Do not imply that a setting is configurable if it is not actually connected to the UI.
+
+---
+
+## 6. Main User Interface
+
+Build a polished, professional retail billing interface.
+
+The design should prioritize fast billing, readability, low interaction count, and keyboard-friendly operation.
+
+### Main layout
+
+Create:
+
+1. A sidebar or compact navigation area.
+2. A top bar with page title, search, and relevant actions.
+3. A product search and category filter section.
+4. A responsive product grid.
+5. A persistent or clearly visible billing cart panel.
+6. A clear total amount and payment selection area.
+7. Toast notifications or inline feedback.
+8. A consistent design system.
+
+Avoid excessive decoration, oversized cards, unnecessary animations, and clutter.
+
+Use appropriate responsive behavior for common desktop resolutions.
+
+### Required pages
+
+- Dashboard
+- Billing / POS
+- Products
+- Categories
+- Inventory / Stock
+- Sales Register
+- Payment Summary
+- Reports
+- Backup and Restore
+- Settings
+
+Create functional navigation for every implemented page.
+
+Do not leave dead buttons or decorative controls that appear functional but do nothing.
+
+If a feature is not implemented yet, clearly label it as planned instead of pretending it works.
+
+---
+
+## 7. Product Management
+
+Implement full product CRUD operations.
+
+Each product should support:
+
+- Product ID
+- Product name
+- SKU or unique product code
+- Category
+- Optional product description
+- Selling price
+- Current stock quantity
+- Low-stock threshold
+- Optional product image
+- Active/inactive status
+- Created and updated timestamps
+
+Requirements:
+
+- Add product
+- Edit product
+- View product details
+- Search by name or SKU
+- Filter by category
+- Filter active and inactive products
+- Update stock
+- Update permanent selling price
+- Deactivate a product without deleting historical sales
+- Validate unique SKU
+- Validate non-negative prices and stock
+- Display appropriate empty and error states
+
+### Permanent price change vs bill-specific price
+
+These are different operations.
+
+Permanent price changes update the product's current selling price.
+
+A bill-specific price override affects only the current sale item and must not silently change the product's permanent price.
+
+Every sale item must store a snapshot of the actual unit price used for that sale.
+
+Historical invoices and reports must continue to display the original sold price even if the product price changes later.
+
+Price overrides must be validated by the backend. Do not trust client-submitted totals or prices.
+
+---
+
+## 8. Billing / POS Workflow
+
+The POS screen must be fast and easy to use.
+
+### Cart
+
+- Click a product card to add one unit.
+- Repeated clicks increase quantity.
+- Use plus and minus buttons to adjust quantity.
+- Remove an item from the cart.
+- Show product name, unit price, quantity, and line total.
+- Support a bill-specific unit price override.
+- Show subtotal, discount, and final payable total.
+- Prevent selling more than available stock.
+- Handle products that become unavailable before checkout.
+- Show clear validation messages.
+
+### Checkout
+
+The checkout workflow should:
+
+1. Validate that the cart contains at least one item.
+2. Validate quantities and stock availability.
+3. Calculate all monetary totals on the backend.
+4. Validate the payment method.
+5. Create the sale and sale items in a database transaction.
+6. Reduce stock atomically.
+7. Generate a unique invoice number.
+8. Store the actual unit price for every item.
+9. Store the payment method and final total.
+10. Return the completed invoice details.
+11. Clear the cart only after a successful response.
+
+If checkout fails, do not leave partial sales or partially reduced stock.
+
+Use decimal monetary values. Define and document the currency and rounding policy. Default the display currency to BDT (৳), configurable in application settings.
+
+### Payment methods
+
+Every sale must have exactly one payment method:
+
+- Cash
+- bKash
+- Nagad
+- Other MFS
+
+Represent these values consistently in the frontend and backend.
+
+Use server-side validation for enum values.
+
+Store payment method in the database in a stable, readable format.
+
+For this version, do not implement split payments or payment gateway integration.
+
+---
+
+## 9. Invoice and Receipt
+
+Generate a useful invoice or receipt containing:
+
+- Shop name and contact information, configurable in Settings
+- Invoice number
+- Sale date and time
+- Product names
+- Quantities
+- Unit prices
+- Line totals
+- Subtotal
+- Discount
+- Final payable total
+- Payment method
+- Optional footer message
+
+Support:
+
+- Printable receipt layout
+- Browser printing through a clean print stylesheet
+- A4 and common receipt-width layouts where practical
+- Reprinting a previous invoice from the Sales Register
+
+Do not require an online printing service.
+
+If a physical receipt printer is needed, document the local printer setup.
+
+---
+
+## 10. Sales Register
+
+Build a functional Sales Register using real database data.
+
+Display:
+
+- Invoice number
+- Date and time
+- Item count
+- Subtotal
+- Discount
+- Total amount
+- Payment method
+- Sale status
+- View details action
+- Print/reprint action
+
+Provide filters for:
+
+- Date range
+- Invoice number
+- Payment method
+- Sale status
+
+Include pagination or an appropriate efficient loading strategy.
+
+Allow users to open a sale and inspect its complete item details.
+
+Historical sales must remain accurate after future product price changes.
+
+---
+
+## 11. Stock Management
+
+Implement stock tracking that remains consistent with completed sales.
+
+Requirements:
+
+- Show current stock for each product.
+- Highlight low-stock products.
+- Prevent negative stock.
+- Record stock increases and decreases.
+- Support manual stock adjustment with a reason.
+- Record the quantity before and after adjustments where appropriate.
+- Record the timestamp and reason for each stock movement.
+- Ensure checkout and stock updates are transactional.
+- Ensure a sale cannot reduce stock twice due to duplicate requests.
+- Prevent cancelling a sale more than once.
+
+When a sale is cancelled, restore stock only once.
+
+Keep the original sale and invoice history for audit purposes.
+
+Do not permanently delete historical sales during ordinary cancellation.
+
+---
+
+## 12. Cancellation and Data Integrity
+
+Implement sale cancellation with clear business rules.
+
+- Only completed sales can be cancelled.
+- A cancelled sale must not appear as a completed sale in payment totals.
+- Restore stock exactly once.
+- Preserve the original sale items and prices.
+- Record cancellation time and reason if supported.
+- Use a database transaction.
+- Prevent duplicate cancellation requests from restoring stock multiple times.
+
+Document the difference between voiding/cancelling a sale and deleting a record.
+
+---
+
+## 13. Dashboard
+
+Build a dashboard that derives its values from the database.
+
+Include:
+
+- Today's completed sales total
+- Today's bill count
+- Average bill value
+- Low-stock product count
+- Sales by payment method
+- Recent sales
+- Top-selling products where sufficient data exists
+
+Never hardcode dashboard figures in the production application.
+
+Ensure cancelled sales are excluded from completed sales totals.
+
+Use a consistent date/time convention and clearly define the local business day.
+
+---
+
+## 14. Payment Summary
+
+Create a dedicated Payment Summary page.
+
+Group completed sales by payment method.
+
+Show:
+
+- Payment method
+- Number of bills
+- Total sales amount
+- Share of total sales where useful
+
+Support date-range filtering.
+
+Provide a summary for Cash, bKash, Nagad, and Other MFS.
+
+The summary must be calculated from database records, not from frontend sample data.
+
+Define how discounts and cancelled sales affect the totals.
+
+Use the same calculation rules in the dashboard, payment summary, sales register, and Excel export.
+
+---
+
+## 15. Excel Export
+
+Implement real `.xlsx` exports using ClosedXML or an equivalent .NET library.
+
+Support date-range export.
+
+Include worksheets such as:
+
+### Worksheet 1: Sales Register
+
+- Invoice number
+- Sale date and time
+- Payment method
+- Subtotal
+- Discount
+- Total
+- Status
+
+### Worksheet 2: Sale Items
+
+- Invoice number
+- Product name
+- SKU
+- Quantity
+- Actual sold unit price
+- Line total
+
+### Worksheet 3: Payment Summary
+
+- Payment method
+- Bill count
+- Total sales amount
+
+### Worksheet 4: Stock Report
+
+- Product name
+- SKU
+- Category
+- Current stock
+- Selling price
+- Low-stock threshold
+
+Use readable headers, appropriate number formats, sensible column widths, and clear worksheet names.
+
+Handle empty result sets gracefully.
+
+Generate the Excel file locally without any cloud service.
+
+Document that a Sales Excel export is not a complete database backup.
+
+---
+
+## 16. Local Database Backup and Restore
+
+Implement a dedicated Backup and Restore page.
+
+Requirements:
+
+- Create a local backup.
+- Allow the user to choose a backup destination where practical.
+- Include products, sales, sale items, stock information, and application data.
+- Restore a previous backup with explicit confirmation.
+- Validate a backup before restoring it.
+- Prevent overwriting the active database while it is in use.
+- Create a safety backup before restore.
+- Handle database file locks and failures safely.
+- Explain what happens to existing data during restore.
+
+Use SQLite's backup facilities or another safe method. Do not blindly copy an actively written database file when transactions or WAL files may be involved.
+
+Never automatically delete the user's database during application upgrades.
+
+---
+
+## 17. Offline-First Requirements
+
+The application must operate without internet after installation.
+
+Audit the entire application for:
+
+- Remote JavaScript dependencies
+- External font requests
+- CDN resources
+- Remote image dependencies
+- External authentication requirements
+- Cloud analytics
+- Online licensing requirements
+- API calls to third-party services
+
+Remove dependencies on remote services for normal operation.
+
+Product images must be stored locally or copied into an application-managed data folder.
+
+Use local API requests and bind the backend to loopback where appropriate.
+
+Do not expose the local API to the public network.
+
+Use an appropriate free local port strategy or robust startup configuration so the application does not fail merely because a hardcoded port is occupied.
+
+If using a fixed local port, detect conflicts and display a clear error.
+
+Make startup and shutdown behavior predictable.
+
+The app must work after reboot without needing a developer terminal.
+
+Do not require Node.js, npm, Vite, or the .NET SDK to be installed on the target computer.
+
+---
+
+## 18. Windows Installer and Publishing
+
+Create a complete Windows x64 deployment process.
+
+The build process should:
+
+1. Install frontend dependencies.
+2. Build the React frontend.
+3. Copy production frontend files to the backend's `wwwroot`.
+4. Build or publish the .NET backend.
+5. Include all necessary runtime files.
+6. Package the application into a Windows installer.
+7. Create Start Menu shortcuts.
+8. Optionally create a Desktop shortcut.
+9. Support uninstall.
+10. Preserve user data by default.
+
+Use a self-contained .NET publish where appropriate.
+
+Create:
+
+- `installer/installer.iss`
+- `scripts/publish-windows.ps1`
+- `installer/README.md`
+
+The PowerShell script should build the frontend, copy its output, publish the backend, and prepare the files for Inno Setup.
+
+Do not claim the Setup `.exe` is complete until the build has actually been run and tested.
+
+Document any external build-time requirements, such as Node.js, .NET SDK, and Inno Setup.
+
+The target computer must not need the development toolchain.
+
+If the native desktop wrapper requires a WebView runtime, explain how the installer can handle the dependency offline or bundle the necessary runtime installer where legally and technically supported.
+
+---
+
+## 19. Security and Reliability
+
+This is a local single-user application, but data integrity still matters.
+
+- Bind local API services to loopback.
+- Validate every API input.
+- Do not trust frontend totals.
+- Validate all prices and quantities on the backend.
+- Use transactions for checkout and cancellation.
+- Avoid SQL injection by using EF Core parameterized queries.
+- Do not hardcode secrets.
+- Avoid unnecessarily exposing local API endpoints to the network.
+- Handle errors without revealing sensitive internal details.
+- Add structured logs with sensible retention.
+- Avoid logging unnecessary personal information.
+- Keep database files and backups in user-controlled locations.
+- Protect backup and restore operations against accidental data loss.
+
+Document the local security model and limitations.
+
+---
+
+## 20. Settings
+
+Create a Settings page for practical shop preferences.
+
+Where supported, allow changing:
+
+- Shop name
+- Shop address and phone
+- Currency display
+- Invoice footer
+- Receipt layout
+- Low-stock threshold default
+- Product card layout
+- Product image visibility
+- Product SKU visibility
+- Product stock visibility
+- UI theme preferences
+- Default date filters where appropriate
+
+Persist settings locally.
+
+Separate shop settings from developer-only configuration.
+
+Do not create settings controls that have no effect.
+
+---
+
+## 21. Testing Requirements
+
+Create meaningful automated tests where practical.
+
+### Backend tests
+
+Test:
+
+- Product creation and validation
+- Product price updates
+- Checkout with multiple products
+- Correct stock reduction
+- Insufficient stock rejection
+- Correct price snapshots
+- Payment method validation
+- Correct payment summary
+- Date-range filtering
+- Sale cancellation
+- Stock restoration exactly once
+- Excel export generation
+- Database migration and initialization
+- Backup and restore safeguards
+
+### Frontend tests
+
+Test:
+
+- Product card rendering
+- Customizable product card configurations
+- Add-to-cart behavior
+- Quantity increment and decrement
+- Removing a cart item
+- Checkout validation
+- Payment method selection
+- Sales Register filters
+- Empty and error states
+
+### Manual offline test
+
+Document a checklist for testing the installed application with Wi-Fi disabled.
+
+Test on a clean Windows 10/11 64-bit machine or a suitable virtual machine.
+
+Do not claim tests passed unless they were actually executed.
+
+---
+
+## 22. Implementation Process
+
+Build the project in phases. Keep each phase functional and verifiable.
+
+### Phase 1: Architecture and project setup
+- Explain the architecture.
+- Create the solution and frontend.
+- Configure SQLite.
+- Define the domain entities.
+- Create the first migration.
+- Confirm the backend starts.
+
+### Phase 2: Product management
+- Product CRUD.
+- Categories.
+- Search and filtering.
+- Local product images.
+- Product card configuration.
+- Test card customization.
+
+### Phase 3: Billing
+- Cart.
+- Quantity controls.
+- Price overrides.
+- Payment method selection.
+- Checkout transaction.
+- Invoice number generation.
+- Stock reduction.
+
+### Phase 4: Sales and stock
+- Sales Register.
+- Invoice details and printing.
+- Stock movements.
+- Cancellation and stock restoration.
+- Data integrity tests.
+
+### Phase 5: Dashboard and reporting
+- Dashboard metrics.
+- Payment Summary.
+- Date filters.
+- Excel export.
+
+### Phase 6: Backup and settings
+- Database backup.
+- Safe restore.
+- Shop settings.
+- UI preference persistence.
+
+### Phase 7: Offline production build
+- React production build.
+- Local asset audit.
+- Static-file serving.
+- Self-contained Windows publish.
+- Local startup and shutdown.
+
+### Phase 8: Installer
+- Inno Setup script.
+- Setup `.exe` creation instructions.
+- Shortcuts and uninstall.
+- Data preservation checks.
+- Clean-machine installation test.
+
+### Phase 9: Final verification
+- Run backend build and tests.
+- Run frontend build and tests.
+- Run the offline checklist.
+- Document limitations and known issues.
+- Provide exact final commands.
+
+---
+
+## 23. Strict Rules for Code Generation
+
+1. Do not generate the entire project as one giant source file.
+2. Do not skip critical files while claiming the project is complete.
+3. Do not use fake backend responses or hardcoded sales data in production features.
+4. Do not leave core features as TODO comments.
+5. Do not use pseudo-code where working implementation is required.
+6. Do not silently change the technology stack.
+7. Do not replace SQLite with a cloud database.
+8. Do not add unnecessary authentication or online licensing to this single-user offline version.
+9. Do not create unnecessary abstractions that make the project harder for a beginner to maintain.
+10. Keep product-card customization isolated from business logic.
+11. Keep UI styling consistent and centralized.
+12. Preserve user data during upgrades.
+13. Explain any breaking database changes before applying them.
+14. Do not claim the installer or executable was built unless it was actually built.
+15. If a response becomes too long, finish the current file, list the files completed, and continue in the next response.
+16. Before modifying existing files, inspect their current contents when those files are available.
+17. If the project does not exist yet, create a coherent initial structure rather than assuming files already exist.
+18. Prefer small, testable implementation steps.
+19. Provide exact file paths for every code block.
+20. Use Windows PowerShell commands where appropriate.
+21. Do not ask me to manually invent missing implementation details when a reasonable default is available. State your assumptions and proceed.
+22. If a decision materially affects data safety or architecture, explain the trade-off clearly.
+
+---
+
+## 24. Expected Deliverables
+
+At the end, provide:
+
+- Complete source code
+- Clear project folder structure
+- Backend API endpoints documentation
+- Database schema and migrations
+- Product-card customization guide
+- Local configuration guide
+- Excel export implementation
+- Backup and restore implementation
+- Automated test instructions
+- Offline test checklist
+- Windows publish script
+- Inno Setup configuration
+- Step-by-step instructions to generate `QuickBilling-Setup.exe`
+- Instructions to install on another Windows computer
+- Instructions for upgrading without losing data
+- Troubleshooting guide
+
+## 25. Start Here
+
+First, provide a concise architecture overview and the complete proposed folder structure.
+
+Then begin Phase 1.
+
+For each phase:
+1. Explain what will be built.
+2. Give the exact terminal commands.
+3. Show each file path.
+4. Provide the complete contents of each new or modified file.
+5. Explain important code decisions in beginner-friendly language.
+6. Give commands to run and verify the phase.
+7. Fix build errors before proceeding.
+8. Maintain a checklist of completed and pending requirements.
+
+Do not stop after producing a plan or mockup. Continue implementing the actual project in manageable, verifiable phases.
+
+The final goal is a maintainable, customizable, genuinely offline Quick Billing application that can be installed on another Windows 10/11 64-bit computer using a Setup `.exe` file.
