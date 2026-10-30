@@ -2,7 +2,11 @@ using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using QuickBilling.Infrastructure.Data;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = AppContext.BaseDirectory
+});
 
 // Configure SQLite Database path at %LOCALAPPDATA%\QuickBilling\quickbilling.db
 var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -20,8 +24,8 @@ builder.Services.AddDbContext<QuickBillingDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Bind strictly to local loopback interface for local desktop security
-builder.WebHost.UseUrls("http://127.0.0.1:5000");
+// Bind to both IPv4 (127.0.0.1) and IPv6 ([::1]) loopback interfaces so neither 127.0.0.1 nor localhost is refused
+builder.WebHost.UseUrls("http://127.0.0.1:5000;http://[::1]:5000;http://localhost:5000");
 
 var app = builder.Build();
 

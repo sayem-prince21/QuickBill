@@ -30,7 +30,7 @@ if ($LASTEXITCODE -ne 0) {
 
 # 3. Copy production static files to ASP.NET Core wwwroot
 Write-Host "`n>>> [Step 3/5] Syncing Static Bundle to ASP.NET Core wwwroot..." -ForegroundColor Cyan
-$wwwroot = Join-Path $PSScriptRoot "..\src\QuickBilling.Api\wwwroot"
+$wwwroot = Join-Path $PSScriptRoot "..\src\dotnet\QuickBilling.Api\wwwroot"
 if (Test-Path $wwwroot) {
     Remove-Item -Recurse -Force $wwwroot
 }
@@ -40,7 +40,7 @@ Write-Host "Static bundle copied successfully." -ForegroundColor Green
 
 # 4. Publish Self-Contained ASP.NET Core x64 App
 Write-Host "`n>>> [Step 4/5] Publishing Self-Contained Windows x64 .NET App..." -ForegroundColor Cyan
-$apiProj = Join-Path $PSScriptRoot "..\src\QuickBilling.Api\QuickBilling.Api.csproj"
+$apiProj = Join-Path $PSScriptRoot "..\src\dotnet\QuickBilling.Api\QuickBilling.Api.csproj"
 $publishOut = Join-Path $PSScriptRoot "..\dist\publish-win64"
 
 dotnet publish $apiProj `
